@@ -23,3 +23,15 @@ const markup = galleryItems.map(galleryItemTemplate).join('');
 
 console.log(markup);
 galleryListContainer.insertAdjacentHTML('beforeend', markup);
+
+
+
+function isOpenModal(event) {
+    if (event.target.nodeName !== 'LI') {
+        return;
+    }
+    
+}
+galleryListContainer.addEventListener('click', isOpenModal);
+
+
