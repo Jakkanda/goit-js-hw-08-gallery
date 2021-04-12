@@ -36,6 +36,7 @@ function isOpenModal(event) {
 
   lightboxEl.classList.add('is-open');
   imgEl.src = galleryItems[key].original;
+  imgEl.setAttribute('key', key);
 }
 galleryListContainer.addEventListener('click', isOpenModal);
 
@@ -48,3 +49,28 @@ function isCloseModal(event) {
 }
 
 closeBtn.addEventListener('click', isCloseModal);
+
+const overlayEl = document.querySelector('.lightbox__overlay');
+overlayEl.addEventListener('click', isCloseModal);
+
+function navigateImage(event) {
+  let index = parseInt(imgEl.getAttribute('key'), 10);
+  const indexOfLastElement = galleryItems.length - 1;
+  const indexOfFirstElement = 0;
+  if (event.code === 'ArrowLeft') {
+    index !== indexOfFirstElement ? (index -= 1) : (index = indexOfLastElement);
+  }
+  if (event.code === 'ArrowRight') {
+    index !== indexOfLastElement ? (index += 1) : (index = indexOfFirstElement);
+  }
+
+  imgEl.src = galleryItems[index].original;
+  imgEl.setAttribute('key', index);
+}
+
+document.addEventListener('keydown', event => {
+  if (event.code === 'Escape') {
+    isCloseModal();
+  }
+  navigateImage(event);
+});
