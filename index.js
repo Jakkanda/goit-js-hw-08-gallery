@@ -19,15 +19,26 @@ const galleryItemTemplate = ({ preview, original, description }, index) => {
 `;
 };
 
+const overlayEl = document.querySelector('.lightbox__overlay');
 const galleryListContainer = document.querySelector('.js-gallery');
 const markup = galleryItems.map(galleryItemTemplate).join('');
 galleryListContainer.insertAdjacentHTML('beforeend', markup);
-
-// Modal
 const lightboxEl = document.querySelector('.js-lightbox');
 const imgEl = document.querySelector('.lightbox__image');
+const closeBtn = document.querySelector('button[data-action="close-lightbox"]');
 
-function isOpenModal(event) {
+galleryListContainer.addEventListener('click', onOpenModal);
+closeBtn.addEventListener('click', onCloseModal);
+overlayEl.addEventListener('click', onCloseModal);
+
+document.addEventListener('keydown', event => {
+  if (event.code === 'Escape') {
+    onCloseModal();
+  }
+  navigateImage(event);
+});
+
+function onOpenModal(event) {
   event.preventDefault();
   if (event.target.nodeName !== 'IMG') {
     return;
@@ -35,23 +46,25 @@ function isOpenModal(event) {
   const key = parseInt(event.target.getAttribute('key'), 10);
 
   lightboxEl.classList.add('is-open');
-  imgEl.src = galleryItems[key].original;
-  imgEl.setAttribute('key', key);
+
+  setImagesForElement(imgEl, key);
 }
-galleryListContainer.addEventListener('click', isOpenModal);
 
-// Button
-const closeBtn = document.querySelector('button[data-action="close-lightbox"]');
+function clearAttributesForElement(element) {
+  element.src = '';
+  element.alt = '';
+}
 
-function isCloseModal(event) {
+function setImagesForElement(element, index) {
+  element.src = galleryItems[index].original;
+  element.alt = galleryItems[index].description;
+  element.setAttribute('key', index);
+}
+
+function onCloseModal(event) {
   lightboxEl.classList.remove('is-open');
-  imgEl.src = '';
+  clearAttributesForElement(imgEl);
 }
-
-closeBtn.addEventListener('click', isCloseModal);
-
-const overlayEl = document.querySelector('.lightbox__overlay');
-overlayEl.addEventListener('click', isCloseModal);
 
 function navigateImage(event) {
   let index = parseInt(imgEl.getAttribute('key'), 10);
@@ -64,13 +77,5 @@ function navigateImage(event) {
     index !== indexOfLastElement ? (index += 1) : (index = indexOfFirstElement);
   }
 
-  imgEl.src = galleryItems[index].original;
-  imgEl.setAttribute('key', index);
+  setImagesForElement(imgEl, index);
 }
-
-document.addEventListener('keydown', event => {
-  if (event.code === 'Escape') {
-    isCloseModal();
-  }
-  navigateImage(event);
-});
